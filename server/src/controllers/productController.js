@@ -1,4 +1,22 @@
-const getProducts = async (req, res) => {
+const Product = require('../models/Product');
+
+// Create a new product => POST /api/v1/products/create
+const newProduct = async (req, res, next) => {
+  try {
+    const product = await Product.create(req.body);
+    res.status(201).json({
+      success: true,
+      product
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+}
+
+const getProducts = async (req, res, next) => {
   try {
     // Simulate fetching products from a database
     const products = [
@@ -14,5 +32,6 @@ const getProducts = async (req, res) => {
 }
 
 module.exports = {
-  getProducts
+  getProducts,
+  newProduct
 };
