@@ -16,16 +16,20 @@ const newProduct = async (req, res, next) => {
   }
 }
 
+// Get all products => GET /api/v1/products/all
 const getProducts = async (req, res, next) => {
   try {
     // Simulate fetching products from a database
-    const products = [
-      { id: 1, name: 'Product 1', price: 100 },
-      { id: 2, name: 'Product 2', price: 200 },
-      { id: 3, name: 'Product 3', price: 300 },
-    ];
+    const products = await Product.find();
+    if (!products || products.length === 0) {
+      return res.status(404).json({ message: 'No products found' });
+    }
 
-    res.status(200).json(products);
+    res.status(200).json({
+      success: true,
+      products,
+      count: products.length
+    });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching products' });
   }
