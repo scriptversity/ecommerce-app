@@ -1,6 +1,6 @@
 const Product = require('../models/Product');
 
-// Create a new product => POST /api/v1/products/create
+// Create a new product => POST /api/v1/products/admin/new
 const newProduct = async (req, res, next) => {
   try {
     const product = await Product.create(req.body);
@@ -35,7 +35,7 @@ const getProducts = async (req, res, next) => {
   }
 }
 
-// Get single product details => GET /api/v1/products/admin/get/:id
+// Get single product details => GET /api/v1/products/get/:id
 const getSingleProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -73,9 +73,30 @@ const updateProduct = async (req, res, next) => {
   }
 }
 
+// Delete Product => /api/v1/products/admin/delete/:id
+const deleteProduct = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    await product.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: "Product was deleted successfully"
+    })
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating product' });
+  }
+}
+
 module.exports = {
   getProducts,
   newProduct,
   getSingleProduct,
-  updateProduct
+  updateProduct,
+  deleteProduct
 };
