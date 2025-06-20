@@ -35,7 +35,7 @@ const getProducts = async (req, res, next) => {
   }
 }
 
-// Get single product details => GET /api/v1/products/:id
+// Get single product details => GET /api/v1/products/admin/get/:id
 const getSingleProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -52,8 +52,30 @@ const getSingleProduct = async (req, res, next) => {
   }
 }
 
+// Update product details => PUT /api/v1/products/admin/update/:id
+const updateProduct = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
+    res.status(200).json({
+      success: true,
+      product: updatedProduct
+    });
+  }
+  catch (error) {
+    res.status(500).json({ message: 'Error updating product' });
+  }
+}
+
 module.exports = {
   getProducts,
   newProduct,
-  getSingleProduct
+  getSingleProduct,
+  updateProduct
 };
