@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const errorMiddleware = require('./middlewares/errors');
 const routes = require('./routes/index');
 
 const app = express();
@@ -24,6 +25,16 @@ app.use("/api/v1", (req, res) => {
     }
   });
 });
+
+// Catch 404 for unmatched routes
+app.use((_req, _res, next) => {
+  const error = new Error('Route Not Found');
+  error.statusCode = 404;
+  next(error);
+});
+
+// Error handling middleware
+app.use(errorMiddleware);
 
 module.exports = app;
 
