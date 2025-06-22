@@ -1,6 +1,7 @@
 const Product = require('../models/Product');
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
+const APIFeatures = require('../utils/apiFeatures');
 
 // Create a new product => POST /api/v1/products/admin/new
 const newProduct = catchAsyncErrors(async (req, res, next) => {
@@ -11,17 +12,24 @@ const newProduct = catchAsyncErrors(async (req, res, next) => {
   });
 })
 
-// Get all products => GET /api/v1/products/all
+// Get all products => GET /api/v1/products/all?keyword=apple&price[gte]=1&price[gte]=100&page=1&limit=10
 const getProducts = catchAsyncErrors(async (req, res, next) => {
-  const products = await Product.find();
+  const resultsPerPage = 4; // Default results per page
+  const totalProductsCount = await Product.countDocuments();
+  const apiFeatures = new APIFeatures(Product.find(), req.query)
+    .search()
+    .filter()
+    .paginate(resultsPerPage);
+  const products = await apiFeatures.query;
   if (!products || products.length === 0) {
     return next(new ErrorHandler('No products found', 404));
   }
 
   res.status(200).json({
     success: true,
-    products,
-    count: products.length
+    count: products.length,
+    productsCount: totalProductsCount,
+    products
   });
 })
 
