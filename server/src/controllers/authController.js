@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
+const sendToken = require('../utils/jwtToken');
 
 // Register a new user => POST /api/v1/auth/register
 const registerUser = catchAsyncErrors(async (req, res, next) => {
@@ -16,13 +17,7 @@ const registerUser = catchAsyncErrors(async (req, res, next) => {
     }
   });
 
-  const token = user.getJwtToken();
-
-  res.status(201).json({
-    success: true,
-    token,
-    user
-  });
+  sendToken(user, 201, res);
 });
 
 const loginUser = catchAsyncErrors(async (req, res, next) => {
@@ -40,19 +35,13 @@ const loginUser = catchAsyncErrors(async (req, res, next) => {
   if (!isPasswordMatched) {
     return next(new ErrorHandler('Invalid email or password', 401));
   }
-  // If user is found and password matches, generate JWT token
-  const token = user.getJwtToken();
-  // and send response
-  res.status(200).json({
-    success: true,
-    token,
-    user
-  });
+
+  sendToken(user, 200, res);
 });
 
 module.exports = {
   registerUser,
-  loginUser,   
+  loginUser,
   // Other controller methods can be added here
   // getUserProfile,
   // updateUserProfile,
