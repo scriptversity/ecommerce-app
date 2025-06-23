@@ -91,10 +91,10 @@ module.exports = {
   registerUser,
   loginUser,
   logoutUser,
+  forgotPassword,
   // Other controller methods can be added here
   // getUserProfile,
   // updateUserProfile,
-  // forgotPassword,
   // resetPassword,
   // updatePassword,
   // getAllUsers,
