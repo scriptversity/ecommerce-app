@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const User = require('../models/user');
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
@@ -87,15 +88,40 @@ const forgotPassword = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
+// Reset password => PUT /api/v1/auth/resetpassword/:token
+const resetPassword = catchAsyncErrors(async (req, res, next) => {
+  const resetPasswordToken = req.params.token;
+  const hashedToken = crypto.createHash('sha256').update(resetPasswordToken).digest('hex');
+
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpire: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    return next(new ErrorHandler('Reset password token is invalid or has expired', 400));
+  }
+
+  if (req.body.password !== req.body.confirmPassword) {
+    return next(new ErrorHandler('Passwords do not match', 400));
+  }
+
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+  sendToken(user, 200, res);
+});
+
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
   forgotPassword,
+  resetPassword,
   // Other controller methods can be added here
   // getUserProfile,
   // updateUserProfile,
-  // resetPassword,
   // updatePassword,
   // getAllUsers,
   // getSingleUser,
