@@ -5,6 +5,7 @@ const APIFeatures = require('../utils/apiFeatures');
 
 // Create a new product => POST /api/v1/products/admin/new
 const newProduct = catchAsyncErrors(async (req, res, next) => {
+  req.body.user = req.user.id; // Set the user ID from the authenticated user
   const product = await Product.create(req.body);
   res.status(201).json({
     success: true,
