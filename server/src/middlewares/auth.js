@@ -26,7 +26,17 @@ const isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   next();
 });
 
-module.exports = { isAuthenticatedUser };
+// Middleware to handle users with specific roles
+const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(new ErrorHandler(`Role: ${req.user.role} is not allowed to access this resource`, 403));
+    }
+    next();
+  };
+}
+
+module.exports = { isAuthenticatedUser, authorizeRoles };
 
 // Alternative implementation without catchAsyncErrors
 // const isAuthenticatedUser = (req, res, next) => {
