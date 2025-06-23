@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
 const errorMiddleware = require('./middlewares/errors');
 const routes = require('./routes/index');
 
@@ -9,7 +10,8 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(morgan('dev')); // Logging middleware
-
+app.use(cookieParser()); // Cookie parser middleware
+// Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // Routes
