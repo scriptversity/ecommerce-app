@@ -29,6 +29,7 @@ module.exports = (err, req, res, next) => {
   // Mongoose: duplicate key
   if (err.code === 11000) {
     const duplicateField = Object.keys(err.keyValue)[0];
+
     error = new ErrorHandler(`Duplicate field entered: ${duplicateField}`, 400);
   }
 
@@ -36,6 +37,19 @@ module.exports = (err, req, res, next) => {
   if (err.name === 'ValidationError') {
     const messages = Object.values(err.errors).map(val => val.message).join(', ');
     error = new ErrorHandler(messages, 400);
+  }
+
+  // Mongoose: JWT token error
+  if (err.name === 'JsonWebTokenError') {
+    error = new ErrorHandler('JSON Web Token is invalid. Try again!', 400);
+  }
+  // Mongoose: JWT token expired
+  if (err.name === 'TokenExpiredError') {
+    error = new ErrorHandler('JSON Web Token has expired. Try again!', 400);
+  }
+  // Mongoose: No token provided
+  if (err.name === 'NoTokenError') {
+    error = new ErrorHandler('No token provided. Please log in again!', 401);
   }
 
   res.status(error.statusCode).json({
