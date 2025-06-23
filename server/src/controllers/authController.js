@@ -2,6 +2,7 @@ const User = require('../models/user');
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const sendToken = require('../utils/jwtToken');
+const sendEmail = require('../utils/sendEmail'); // Assuming you have a utility function to send emails
 
 // Register a new user => POST /api/v1/auth/register
 const registerUser = catchAsyncErrors(async (req, res, next) => {
@@ -39,6 +40,7 @@ const loginUser = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
+// Logout user => POST /api/v1/auth/logout
 const logoutUser = catchAsyncErrors(async (req, res, next) => {
   res.cookie('token', null, {
     expires: new Date(Date.now()),
@@ -48,6 +50,41 @@ const logoutUser = catchAsyncErrors(async (req, res, next) => {
     success: true,
     message: 'Logged out successfully'
   });
+});
+
+// Forgot password => POST /api/v1/auth/forgotpassword
+const forgotPassword = catchAsyncErrors(async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new ErrorHandler('User not found with this email', 404));
+  }
+  // Get reset password token
+  const resetToken = user.getResetPasswordToken();
+  await user.save({ validateBeforeSave: false });
+
+  // Create reset password URL
+  const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${resetToken}`;
+
+  const message = `Your password reset token is as follows:\n\n${resetUrl}\n\nIf you have not requested this, please ignore this email.`;
+  try {
+    // Send email (using a hypothetical sendEmail function)
+    await sendEmail({
+      email: user.email,
+      subject: 'ShopIT Password Recovery',
+      message
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Email sent to: ${user.email}`
+    });
+  } catch (error) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+    return next(new ErrorHandler(error.message, 500));
+  }
 });
 
 module.exports = {
