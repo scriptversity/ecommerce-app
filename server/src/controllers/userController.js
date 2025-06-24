@@ -62,8 +62,22 @@ const updateProfile = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// Admin routes
+
+// Get all users => GET /api/v1/users/admin/all
+const getAllUsers = catchAsyncErrors(async (req, res, next) => {
+  const users = await User.find();
+  res.status(200).json({
+    success: true,
+    users,
+  });
+});
+
+// Get user details
+
 module.exports = {
   getUserProfile,
   updatePassword,
   updateProfile,
+  getAllUsers,
 };
