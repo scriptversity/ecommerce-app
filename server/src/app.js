@@ -1,36 +1,36 @@
-const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
-const errorMiddleware = require('./middlewares/errors');
-const routes = require('./routes/index');
+const express = require("express");
+const cors = require("cors");
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
+const errorMiddleware = require("./middlewares/errors");
+const routes = require("./routes/index");
 
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(morgan('dev')); // Logging middleware
+app.use(morgan("dev")); // Logging middleware
 app.use(cookieParser()); // Cookie parser middleware
 // Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // Routes
-app.use('/api/v1', routes);
-app.use("/api/v1", (req, res) => {
-  res.status(200).json({
-    message: "Welcome to Shopit API",
-    status: "success",
-    data: {
-      name: "Shopit API",
-      version: "1.0.0",
-      description: "A simple e-commerce API built with Express.js"
-    }
-  });
-});
+app.use("/api/v1", routes);
+// app.use("/api/v1", (req, res) => {
+//   res.status(200).json({
+//     message: "Welcome to Shopit API",
+//     status: "success",
+//     data: {
+//       name: "Shopit API",
+//       version: "1.0.0",
+//       description: "A simple e-commerce API built with Express.js"
+//     }
+//   });
+// });
 
 // Catch 404 for unmatched routes
 app.use((_req, _res, next) => {
-  const error = new Error('Route Not Found');
+  const error = new Error("Route Not Found");
   error.statusCode = 404;
   next(error);
 });
@@ -39,5 +39,3 @@ app.use((_req, _res, next) => {
 app.use(errorMiddleware);
 
 module.exports = app;
-
-
