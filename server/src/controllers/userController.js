@@ -87,10 +87,35 @@ const getUserDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// Update user details (admin only) => PUT /api/v1/users/admin/update/:id
+const updateUserDetails = catchAsyncErrors(async (req, res, next) => {
+  const newUserData = {
+    name: req.body.name,
+    email: req.body.email,
+    role: req.body.role, // Admin can change user role
+  };
+
+  const user = await User.findByIdAndUpdate(req.params.id, newUserData, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
+
 module.exports = {
   getUserProfile,
   updatePassword,
   updateProfile,
   getAllUsers,
   getUserDetails,
+  updateUserDetails,
 };

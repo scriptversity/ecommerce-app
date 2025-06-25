@@ -5,6 +5,7 @@ const {
   updateProfile,
   getAllUsers,
   getUserDetails,
+  updateUserDetails,
 } = require("../controllers/userController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
 
@@ -24,5 +25,9 @@ router
 router
   .route("/admin/:id")
   .get(isAuthenticatedUser, authorizeRoles("admin"), getUserDetails);
+// Route to update user details (admin only)
+router
+  .route("/admin/update/:id")
+  .put(isAuthenticatedUser, authorizeRoles("admin"), updateUserDetails);
 
 module.exports = router;
