@@ -111,6 +111,23 @@ const updateUserDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// Delete user (admin only) => DELETE /api/v1/users/admin/delete/:id
+const deleteUser = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  // Remove avatar from cloudinary: TODO: Implement avatar deletion logic in the future
+
+  await user.deleteOne();
+
+  res.status(200).json({
+    success: true,
+    message: "User deleted successfully",
+  });
+});
+
 module.exports = {
   getUserProfile,
   updatePassword,
@@ -118,4 +135,5 @@ module.exports = {
   getAllUsers,
   getUserDetails,
   updateUserDetails,
+  deleteUser,
 };
