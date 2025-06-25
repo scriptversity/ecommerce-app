@@ -12,7 +12,8 @@ const orderSchema = mongoose.Schema({
     },
     phoneNo: {
       type: String,
-      required: true
+      required: true,
+      // match: /^[0-9\-+\s()]{7,20}$/
     },
     postalCode: {
       type: String,
@@ -64,7 +65,6 @@ const orderSchema = mongoose.Schema({
   paidAt: {
     type: Date
   },
-
   itemsPrice: {
     type: Number,
     required: true,
@@ -88,16 +88,18 @@ const orderSchema = mongoose.Schema({
   orderStatus: {
     type: String,
     required: true,
+    enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled'],
     default: 'Processing'
   },
   deliveredAt: {
     type: Date
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-
-})
+  // createdAt: {
+  //   type: Date,
+  //   default: Date.now
+  // }
+},
+  { timestamps: true }
+)
 
 module.exports = mongoose.model('Order', orderSchema)
