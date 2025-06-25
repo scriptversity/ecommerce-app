@@ -73,11 +73,24 @@ const getAllUsers = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Get user details
+// Get user details => GET /api/v1/users/admin/:id
+const getUserDetails = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return next(
+      new ErrorHandler(`User with id: ${req.params.id} not found`, 404)
+    );
+  }
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
 
 module.exports = {
   getUserProfile,
   updatePassword,
   updateProfile,
   getAllUsers,
+  getUserDetails,
 };
