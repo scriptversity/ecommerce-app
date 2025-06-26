@@ -50,8 +50,25 @@ const getMyOrders = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// Get all orders (Admin) => GET /api/v1/orders/admin/all
+const getAllOrders = catchAsyncErrors(async (req, res, next) => {
+  const orders = await Order.find().populate("user", "name email");
+
+  let totalAmount = 0;
+  orders.forEach(order => {
+    totalAmount += order.totalPrice;
+  });
+
+  res.status(200).json({
+    success: true,
+    totalAmount,
+    orders
+  });
+});
+
 module.exports = {
   newOrder,
   getSingleOrder,
-  getMyOrders
+  getMyOrders,
+  getAllOrders
 };
