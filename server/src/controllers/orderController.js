@@ -66,9 +66,53 @@ const getAllOrders = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// Update order status (Admin) => PUT /api/v1/orders/admin/:id/status
+const updateOrderStatus = catchAsyncErrors(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+
+  if (!order) {
+    return next(new ErrorHandler("Order not found with this ID", 404));
+  }
+
+  if (order.orderStatus === "Delivered") {
+    return next(new ErrorHandler("You have already delivered this order", 400));
+  }
+
+  order.orderItems.forEach(async (item) => {
+    await updateStock(item.product, item.quantity);
+  });
+
+  order.orderStatus = req.body.status;
+  if (req.body.status === "Delivered") {
+    order.deliveredAt = Date.now();
+  }
+
+  await order.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    success: true,
+    message: "Order status updated successfully"
+  });
+});
+
+async function updateStock(productId, quantity) {
+  const product = await Product.findById(productId);
+  // if (!product) {
+  //   throw new ErrorHandler("Product not found", 404);
+  // }
+  product.stock -= quantity;
+  // if (product.stock < 0) {
+  //   product.stock += quantity;
+  //   throw new ErrorHandler("Insufficient stock", 400);
+  // }
+
+  await product.save({ validateBeforeSave: false });
+}
+
 module.exports = {
   newOrder,
   getSingleOrder,
   getMyOrders,
-  getAllOrders
+  getAllOrders,
+  updateOrderStatus
 };
