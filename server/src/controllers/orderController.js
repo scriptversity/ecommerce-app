@@ -25,7 +25,33 @@ const newOrder = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// Get single order details => GET /api/v1/orders/:id
+const getSingleOrder = catchAsyncErrors(async (req, res, next) => {
+  const order = await Order.findById(req.params.id).populate("user", "name email");
+
+  if (!order) {
+    return next(new ErrorHandler("Order not found with this ID", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    order
+  });
+});
+
+// Get all orders for a user => GET /api/v1/orders/me
+const getMyOrders = catchAsyncErrors(async (req, res, next) => {
+  console.log(req.user);
+  const orders = await Order.find({ user: req.user.id });
+
+  res.status(200).json({
+    success: true,
+    orders
+  });
+});
+
 module.exports = {
   newOrder,
-  // Add other order-related functions here as needed
+  getSingleOrder,
+  getMyOrders
 };
