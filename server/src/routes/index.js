@@ -4,6 +4,7 @@ const router = express.Router();
 const authRoutes = require("./auth");
 const userRoutes = require("./user");
 const productRoutes = require("./product");
+const orderRoutes = require("./order");
 
 // later we can transform this into a controller if it grows larger for example general.js for gerneral routes
 // or we can keep it as is for simplicity
@@ -27,5 +28,6 @@ router.get("/", (req, res) => {
 router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 router.use("/products", productRoutes);
+router.use("/orders", orderRoutes);
 
 module.exports = router;
