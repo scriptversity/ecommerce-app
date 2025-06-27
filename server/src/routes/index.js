@@ -5,6 +5,7 @@ const authRoutes = require("./auth");
 const userRoutes = require("./user");
 const productRoutes = require("./product");
 const orderRoutes = require("./order");
+const reviewRoutes = require("./review");
 
 // later we can transform this into a controller if it grows larger for example general.js for gerneral routes
 // or we can keep it as is for simplicity
@@ -29,5 +30,6 @@ router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 router.use("/products", productRoutes);
 router.use("/orders", orderRoutes);
+router.use("/reviews", reviewRoutes);
 
 module.exports = router;
