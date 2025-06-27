@@ -50,10 +50,57 @@ const createProductReview = catchAsyncErrors(async (req, res) => {
 // Get product reviews => GET /api/v1/reviews
 const getProductReviews = catchAsyncErrors(async (req, res) => {
   const product = await Product.findById(req.query.id);
+  if (!product) {
+    return res.status(404).json({
+      success: false,
+      message: "Product not found",
+    });
+  }
   res.status(200).json({
     success: true,
     reviews: product.reviews,
   });
 });
 
-module.exports = { createProductReview, getProductReviews };
+// Delete Product Review => DELETE /api/v1/reviews
+const deleteProductReview = catchAsyncErrors(async (req, res) => {
+  const product = await Product.findById(req.query.productId);
+  if (!product) {
+    return res.status(404).json({
+      success: false,
+      message: "Product not found",
+    });
+  }
+  const reviews = product.reviews.filter(
+    (rev) => rev._id.toString() !== req.query.reviewId.toString()
+  );
+
+  const numOfReviews = reviews.length;
+  const ratings =
+    product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+    reviews.length;
+
+  await Product.findByIdAndUpdate(
+    req.query.productId,
+    {
+      reviews,
+      ratings,
+      numOfReviews,
+    },
+    {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    }
+  );
+  res.status(200).json({
+    success: true,
+    message: "Review deleted successfully",
+  });
+});
+
+module.exports = {
+  createProductReview,
+  getProductReviews,
+  deleteProductReview,
+};
