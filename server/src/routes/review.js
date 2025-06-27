@@ -1,8 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-const { createProductReview } = require("../controllers/reviewController");
+const {
+  createProductReview,
+  getProductReviews,
+} = require("../controllers/reviewController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middlewares/auth");
+
+router.route("/").get(getProductReviews);
 
 router.route("/new").put(isAuthenticatedUser, createProductReview);
 

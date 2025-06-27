@@ -47,4 +47,13 @@ const createProductReview = catchAsyncErrors(async (req, res) => {
   });
 });
 
-module.exports = { createProductReview };
+// Get product reviews => GET /api/v1/reviews
+const getProductReviews = catchAsyncErrors(async (req, res) => {
+  const product = await Product.findById(req.query.id);
+  res.status(200).json({
+    success: true,
+    reviews: product.reviews,
+  });
+});
+
+module.exports = { createProductReview, getProductReviews };
